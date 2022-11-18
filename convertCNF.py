@@ -11,33 +11,6 @@ def cfgToArray(name):
     file.close()
     return lines
 
-# Count the amount of production in a cfg
-def countProds(cfg):
-    for rule in cfg:
-        i=2
-        count=1
-        while(i<len(rule)):
-            if(rule[i]=='|'):
-                count+=1
-    return count
-
-
-# Determine whether a singleunit production exist in a rule
-def singleUnitExist(rule):
-    count=0
-    i=2
-    if(len(rule)==3 and rule[2][0]>=65 and rule[2][0]<=90):
-        return True
-    while(i<len(rule)):
-        if(rule[i]=='|'):
-            if(count==1):
-                return True
-            count=-1
-        count+=1
-        i+=1
-    return False
-
-
 # Search for a spesific variable production
 def searchForProd(cfg, prod):
     for rule in cfg:
@@ -133,7 +106,7 @@ def removeEmpty(cfg):
 
 
 # Remove useless Pipes
-def removeUselessPipe(rule):
+def removeUselessPipes(rule):
     
     # Remove pipe at the beginning
     while(rule[2]=='|'):
@@ -158,6 +131,7 @@ def removeUselessPipe(rule):
 
     return rule
 
+# Check if an epsilon still exist in the CFG
 def epsilonExist(cfg):
     for rule in cfg:
         for prod in rule:
@@ -166,7 +140,7 @@ def epsilonExist(cfg):
     return False
 
 # Eliminating epsilon production
-def removeEpsilon(cfg):
+def epsilonElimination(cfg):
     while(epsilonExist(cfg)):
         epsilons=[]
         for rule in cfg:
@@ -218,12 +192,12 @@ def removeEpsilon(cfg):
                 if(i<len(rule) and rule[i]=='|'):
                     i+=1
                     start=i
-            rule=removeUselessPipe(rule)
+            rule=removeUselessPipes(rule)
             rule=deleteDuplicates(rule)
     return cfg
 
 # Eliminating single unit productions
-def replaceUnit(cfg):
+def unitElimination(cfg):
     for line in cfg:
         i=2
         start=i
@@ -251,22 +225,18 @@ def replaceUnit(cfg):
                     #     print(replacement)
                     #     print(line)
                     #     count+=1
+                else:
+                    i+=1
                 start=i
                 prod=[]
-        # print("Sebelum delete duplicates")
-        # print(cfg)
         line=deleteDuplicates(line)
-        # print("Sebelum delete duplicate pipe")
-        # print(cfg)
-        line=removeUselessPipe(line)
-        # print("setelah")
-        # print(cfg)
+        line=removeUselessPipes(line)
     return cfg
         
 
 # Eliminating useless variables
-def removeUseless(cfg):
-    # Check if a variable exist in any RHS
+def uselessElimination(cfg):
+    # Check if the variable exist in any RHS
     i=0
     useless=[]
     while(i<len(cfg)):
@@ -291,8 +261,8 @@ def removeUseless(cfg):
     for delete in useless:
         temp=cfg.pop(delete-minus)
         minus+=1
-    print("FIRST ELIMINATION")
-    displayCFG(cfg)
+    # print("FIRST ELIMINATION")
+    # displayCFG(cfg)
     
     #Check if a variable exist in any LHS
     useless=[]
@@ -359,11 +329,9 @@ def removeUseless(cfg):
         if(rule[last]=='|'):
             temp=rule.pop(last)
     cfg=removeEmpty(cfg)
-    # print("SECOND ELIMINATION")
-    # displayCFG(cfg)
-    return cfg
     print("SECOND ELIMINATION")
-    print(cfg)
+    displayCFG(cfg)
+    return cfg
 
 
 # Count the amount of terminal in a production
@@ -541,13 +509,13 @@ cfg=cfgToArray('test.txt')
 #removeEmpty(cfg)
 #removeAUnit(cfg[2],2)
 # print("EPISOL ELIM")
-cfg=removeEpsilon(cfg)
+# cfg=epsilonElimination(cfg)
 # displayCFG(cfg)
 
 # print("UNIT REPLACE")
-cfg=replaceUnit(cfg)
+# cfg=unitElimination(cfg)
 # displayCFG(cfg)
-cfg=removeUseless(cfg)
+cfg=uselessElimination(cfg)
 # displayCFG(cfg)
 
 #print(cfg)
