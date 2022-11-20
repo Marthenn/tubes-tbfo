@@ -1,3 +1,12 @@
+# Get terminals from a text file
+def getTerminal(name):
+    terminals = []
+    file=open(name,'r')
+    lines = file.readlines()
+    for line in lines:
+        terminals.append(line.replace('\n',''))
+    return terminals
+
  # Convert a text based CFG to an array
 def cfgToArray(name):
     file=open(name,'r')
@@ -534,22 +543,24 @@ def writeToFile(file,cfg):
         file.write("\n")
 
 
-cfg=cfgToArray('test.txt')
-# displayCFG(cfg)
+if __name__ == "__main__":
+    # cfg=cfgToArray('automata/cfg.txt')
+    # # displayCFG(cfg)
 
 
-#removeEmpty(cfg)
-#removeAUnit(cfg[2],2)
-# print("EPISOL ELIM")
-cfg=removeEpsilon(cfg)
-# displayCFG(cfg)
+    # #removeEmpty(cfg)
+    # #removeAUnit(cfg[2],2)
+    # # print("EPISOL ELIM")
+    # cfg=removeEpsilon(cfg)
+    # # displayCFG(cfg)
 
-# print("UNIT REPLACE")
-cfg=replaceUnit(cfg)
-# displayCFG(cfg)
-cfg=removeUseless(cfg)
-# displayCFG(cfg)
+    # # print("UNIT REPLACE")
+    # cfg=replaceUnit(cfg)
+    # # displayCFG(cfg)
+    # cfg=removeUseless(cfg)
+    # displayCFG(cfg)
 
-#print(cfg)
-
+    # #print(cfg)
+    terminals = getTerminal('automata/terminals.txt')
+    print(terminals)
                 
