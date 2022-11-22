@@ -407,8 +407,16 @@ def terminalExist(prod):
 
 def ruleExist(cfg,rule):
     for lines in cfg:
-        if(lines[0]==rule[0]):
-            return True
+        if(len(lines)==len(rule)):
+            i=2
+            flag=True
+            while(i<len(lines)):
+                if(lines[i]!=rule[i]):
+                    flag=False
+                    break
+                i+=1
+            if(flag):
+                return True
     return False
 
 def productionExist(rule,prod):
