@@ -522,10 +522,7 @@ def convertToCNF(cfg):
                 i+=1
                 start=i
                 prod=[]
-    return cfg
-    displayCFG(cfg)
-
-        
+    return cfg        
 
 def displayCFG(cfg):
     for rules in cfg:
@@ -550,24 +547,48 @@ def writeToFile(file,cfg):
             i+=1
         file.write("\n")
 
+def FileToCNF(file):
+    file=open(file,'r')
+    lines = file.readlines()
+    file.close()
+    cnf = {}
+    for line in lines:
+        line = line.strip()
+        line = line.split()
+        prod = []
+        production = ''
+        for i in range(2,len(line)):
+            if(line[i]!='|'):
+                if(production!=''):
+                    production+=' '
+                production += line[i]
+            else:
+                prod.append(production)
+                production = ''
+        prod.append(production)
+        cnf[line[0]] = prod
+    return cnf
+
 
 if __name__ == "__main__":
     #cfg=cfgToArray('automata/cfg.txt')
-    cfg=cfgToArray("test.txt")
-    displayCFG(cfg)
-    print("EPSILON")
+    cfg=cfgToArray("automata/test.txt")
+    # displayCFG(cfg)
+    # print("EPSILON")
     cfg=epsilonElimination(cfg)
-    displayCFG(cfg)
-    print("UNIT")
+    # displayCFG(cfg)
+    # print("UNIT")
     cfg=unitElimination(cfg)
-    displayCFG(cfg)
-    print("USELESS")
+    # displayCFG(cfg)
+    # print("USELESS")
     cfg=uselessElimination(cfg)
-    displayCFG(cfg)
-    print("CNF")
+    # displayCFG(cfg)
+    # print("CNF")
     cfg=convertToCNF(cfg)
-    displayCFG(cfg)
-    writeToFile("cnf.txt",cfg)
+    # displayCFG(cfg)
+    writeToFile("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/result.txt",cfg)
+    cnf=FileToCNF("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/result.txt")
+    print(cnf)
 
     # #print(cfg)
     # terminals = getTerminal('automata/terminals.txt')
