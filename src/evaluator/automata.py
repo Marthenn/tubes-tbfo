@@ -10,7 +10,7 @@ class Automata:
     transition = {}
 
     @abstractmethod
-    def evaluate(self, string):
+    def evaluate(self, evaluation_object):
         pass
 
 
@@ -38,12 +38,12 @@ class VariableAutomata(Automata, ABC):
 
         for char in variable_name:
             last_char = char
-            input_c = 'IN' if char in nums else 'NIN'
+            fa_input = 'IN' if char in nums else 'NIN'
 
             if char not in allowed:
-                input_c = 'NA'
+                fa_input = 'NA'
 
-            transition_tuple = (current_state, input_c)
+            transition_tuple = (current_state, fa_input)
             current_state = self.transition.get(transition_tuple)
 
             if current_state is None:
@@ -57,7 +57,70 @@ class VariableAutomata(Automata, ABC):
         return res, last_char
 
 
-class OperationAutomata:
+# unfortunately we made the dfa without ternary in consideration, so rather than reconstructing the correct dfa,
+# we decided (not happily) to create another evaluator function for ternary operations
+class TernaryAutomata(Automata, ABC):
+
+    def __init__(self):
+        self.states = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6']
+        self.alphabets = ['?', ':', 'VALID']
+        self.start_state = self.states[0]
+        self.accept_states = ['S6']
+        self.transition = {('S1', 'VALID'): 'S2',
+                           ('S2', '?'): 'S3',
+                           ('S3', 'VALID'): 'S4',
+                           ('S4', ':'): 'S5',
+                           ('S5', 'VALID'): 'S6',
+                           ('S6', '?'): 'S3'}
+        self.expr_checker = OperationAutomata()
+
+    def evaluate(self, expression_list):
+        ter_ops = {'?', ':'}
+        current_state = self.start_state
+
+        for i, el in enumerate(expression_list):
+
+            if el in ter_ops:
+                fa_input = el
+            else:
+                eval_s = self.__evaluate_exp(expression_list, i)
+
+                fa_input = 'VALID' if eval_s else 'INVALID'
+
+            transition_tuple = (current_state, fa_input)
+
+            current_state = self.transition.get(transition_tuple)
+
+            if current_state is None:
+                print(transition_tuple, el)
+                return False
+
+        return True
+
+    def __evaluate_exp(self, expression_list, start_idx):
+        end_idx = start_idx
+
+        list_len = len(expression_list)
+
+        # fishy, check
+        while end_idx < (list_len - 1) and expression_list[end_idx] != '?' and expression_list[end_idx] != ':' \
+                and expression_list[end_idx] != ')' and expression_list[end_idx] != ';':
+            end_idx += 1
+
+        if not end_idx < list_len:
+            return False
+
+        end_idx = end_idx + 1 if end_idx == start_idx else end_idx
+
+        eval_s = self.expr_checker.evaluate(expression_list[start_idx:end_idx])
+
+        if eval_s:
+            expression_list[start_idx:end_idx] = ['expr']
+
+        return eval_s
+
+
+class OperationAutomata(Automata, ABC):
 
     def __init__(self):
         self.states = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11']
@@ -79,7 +142,7 @@ class OperationAutomata:
                            ('S7', 'BIN_OPS_PRE'): 'S3',
                            ('S1', 'URY_PRE'): 'S10',
                            ('S1', 'BIN_URY_PRE'): 'S10',
-                           ('S10', 'F_CALL') : 'S8',
+                           ('S10', 'F_CALL'): 'S8',
                            ('S10', 'VAR'): 'S8',
                            ('S10', 'NUM'): 'S8',
                            ('S10', 'LLS'): 'S8',
@@ -95,7 +158,8 @@ class OperationAutomata:
                            ('S3', 'LLS'): 'S4',
                            ('S4', 'COMP_OPS'): 'S1',
                            ('S4', 'BIN_OPS'): 'S1',
-                           ('S4', 'URY_POST_PRE_NU'): 'S1'}
+                           ('S4', 'URY_POST_PRE_NU'): 'S1',
+                           ('S4', 'BIN_URY_PRE'): 'S1'}
         self.operators = {'COMP_OPS': {'==', '!=', '===', '!==', '>', '>=', '<', '<='},  # comparison operators
                           'BIN_OPS': {'*', '/', '%', '**', '&', '|', '^', '<<', '>>', '>>>', '&&', '||'},
                           # binary operators
@@ -104,27 +168,18 @@ class OperationAutomata:
                           'URY_PRE': {'~', '!'}}  # unary pre fix operators
         self.var_checker = VariableAutomata()
 
+    # this function assumes that expression_list is already free of ( or ) or any other symbols such that
+    # the expression is not regular when they r members of the list
     def evaluate(self, expression_list):
         # assignment shud be handled by the cfg
         current_state = self.start_state
-        input_s = None
+        fa_input = None
 
         for i, el in enumerate(expression_list):
-            input_s = self.__get_input(el)
+            fa_input = self.__get_input(el)
 
-            if input_s is None:
-
-                if '.' not in el or el[0] == '.' or el[len(el)-1] == '.':
-                    input_s = 'NA'
-                elif expression_list[i+1] == '(' and expression_list[i+2] == ')':
-                    input_s = 'F_CALL'
-                    expression_list.pop(i+1)
-                    expression_list.pop(i+1)
-                else:
-                    input_s = 'VAR'
-
-            transition_tuple = (current_state, input_s)
-            print(current_state, input_s)
+            transition_tuple = (current_state, fa_input)
+            # print(current_state, fa_input)
             current_state = self.transition.get(transition_tuple)
 
             if current_state is None:
@@ -138,28 +193,38 @@ class OperationAutomata:
         return res
 
     def __get_input(self, el):
-        input_s = None
+        fa_input = None
 
-        if self.var_checker.evaluate(el)[0]:
-            input_s = 'VAR'
+        if el == 'FUNCTION_CALL':
+            fa_input = 'F_CALL'
+        elif self.var_checker.evaluate(el)[0]:
+            fa_input = 'VAR'
         elif (el[0] == "'" and el[len(el) - 1] == "'") or (el[0] == '"' and el[len(el) - 1] == '"'):
-            input_s = 'LLS'
+            fa_input = 'LLS'
         else:
             try:
                 int(el)
-                input_s = 'NUM'
+                fa_input = 'NUM'
             except ValueError:
                 keys = self.operators.keys()
 
                 for key in keys:
                     if el in self.operators.get(key):
-                        input_s = key
+                        fa_input = key
                         break
 
-        return input_s
+        return fa_input
 
 
-evaluator_exp = OperationAutomata()
-expresyen = 'fUNc.call ( )'
-print(expresyen)
-print(evaluator_exp.evaluate(expresyen.split(' ')))
+if __name__ == '__main__':
+    evaluator_exp = OperationAutomata()
+    evaluator_var = VariableAutomata()
+    evaluator_ternary = TernaryAutomata()
+    # expresyen = 'variable_name'
+    # print(expresyen)
+    # print(evaluator_exp.evaluate(expresyen.split(' ')))
+    # var_name = '==='
+    # print(evaluator_var.evaluate(var_name))
+    inp = 'x > 2 ? x + 3 : 1'.split(' ')
+    print(inp)
+    print(evaluator_ternary.evaluate(inp))
