@@ -5,6 +5,7 @@ def getTerminal(name):
     lines = file.readlines()
     for line in lines:
         terminals.append(line.replace('\n',''))
+    file.close()
     return terminals
 
  # Convert a text based CFG to an array
@@ -539,6 +540,7 @@ def displayCFG(cfg):
     
 
 def writeToFile(file,cfg):
+    file=open(file,"w")
     for lines in cfg:
         i=0
         while(i<len(lines)):
@@ -565,6 +567,7 @@ if __name__ == "__main__":
     print("CNF")
     cfg=convertToCNF(cfg)
     displayCFG(cfg)
+    writeToFile("cnf.txt",cfg)
 
     # #print(cfg)
     # terminals = getTerminal('automata/terminals.txt')
