@@ -1,5 +1,4 @@
-from src.evaluator import automata
-
+import automata
 
 def parse_words(file_path):
     list_of_words = []
@@ -91,9 +90,56 @@ prod = {'IF': 'if',
         'EQUAL': '=',
         'LET': 'let'}
 
-arr_rs = (parse_words('/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt'))
-print(arr_rs)
+arr_rs = (parse_words('test.txt'))
+#print(arr_rs)
 arr_1 = ['if', '(', 'konts', '+', '3', '===', '9', ')']
 arr_2 = ['x', '=', 'konts', '+', '3', '===', '9', '+', ';']
 arr_3 = ['let', 'x', ';']
-print(' '.join(parse_with_fa(arr_rs, prod)))
+print(' '.join(parse_with_fa(arr_3, prod)))
+
+def parse_comments(word_list, start_idx):
+    # this means the element at start_idx is a comment starter
+
+    # find the comment's last element
+
+    # remove elements from start_idx to end_dx (last comment's element)
+
+    # done!
+    
+    if word_list[start_idx] != '//' or word_list[start_idx] != '/*':
+        return
+
+    if word_list[start_idx] == '//':
+        while word_list[start_idx] != '\n':
+            word_list.pop(start_idx)
+        word_list.pop(start_idx)
+        return
+
+    if word_list[start_idx] == '/*':
+        while word_list[start_idx] != '*/':
+            word_list.pop(start_idx)
+        word_list.pop(start_idx)
+        return
+
+    
+
+    
+
+    
+
+
+
+    # while i < len(word_list):
+    #     if word_list[i]=='//':
+    #         j = i
+    #         while j < len(word_list) and word_list[i] != '\n':
+    #             word_list.pop(j)
+    #             j += 1
+    #     if i < len(word_list) and word_list[i] == '/*':
+    #         j = i
+    #         while j < len(word_list) and word_list[j] != '*/':
+    #             word_list.pop(j)
+    #             j += 1
+    #         if j < len(word_list) and word_list[j] == '*/':
+    #             word_list.pop(j)
+    #     i += 1            
