@@ -37,7 +37,6 @@ CATCH -> catch
 FINALLY -> finally
 THROW -> throw
 COMMA -> ,
-STRING -> string
 EQUALS -> =
 PLUS -> +
 MIN -> -
@@ -59,3 +58,4 @@ FALSE -> false
 NAN -> NaN
 NULL -> null
 DOT -> .
+FUNCTION -> function
