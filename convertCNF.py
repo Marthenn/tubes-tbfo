@@ -159,7 +159,7 @@ def epsilonElimination(cfg):
             while(i<len(rule)):
                 if(rule[i]=='|'):
                     i+=1
-                if(rule[i]=='EPSILON'):
+                if(i < len(rule) and rule[i]=='EPSILON'):
                     exist=True
                     break
                 i+=1
