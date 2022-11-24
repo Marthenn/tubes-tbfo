@@ -53,7 +53,7 @@ function pen() {
       if (lalaala) {
         return 3;
       } else {
-          for (let bai = 0; bai < 1000; ++bai) {
+          for (/* hiyah kosong bingung yah*/) {
               ++ta;
               break;
           }
