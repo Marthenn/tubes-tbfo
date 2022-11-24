@@ -32,12 +32,20 @@ def searchForProd(cfg, prod):
                 i+=1
             return searched
 
+def searchForTermRule(cfg,term):
+    for rules in cfg:
+        if len(rules) == 3:
+            if rules[2] == term:
+                return rules[0]
+    
 
 #Determine whether the symbol is a terminal or a variable
 def terminalOrNot(unit):
-    if((ord(unit[0])>=65 and ord(unit[0])<=90) or ord(unit[0])==124):
-        return False
-    return True
+    terminals=getTerminal('automata/terminals.txt')
+    for terminal in terminals:
+        if terminal == unit:
+            return True
+    return False
 
 
 # Delete production duplicates in a rule
@@ -308,22 +316,23 @@ def uselessElimination(cfg):
     i=1
     useless=[]
     while(i<len(cfg)):
-        exist=False
-        cmp=cfg[i][0]
-        j=0
-        while(j<len(cfg)):
-            if(j!=i):
-                k=2
-                while(k<len(cfg[j])):
-                    if(cmp==cfg[j][k]):
-                        exist=True
-                        break
-                    k+=1
-            if(exist):
-                break
-            j+=1
-        if(not(exist)):
-            useless.append(i)
+        if not(len(cfg[i]) == 3 and terminalOrNot(cfg[i][2])):
+            exist=False
+            cmp=cfg[i][0]
+            j=0
+            while(j<len(cfg)):
+                if(j!=i):
+                    k=2
+                    while(k<len(cfg[j])):
+                        if(cmp==cfg[j][k]):
+                            exist=True
+                            break
+                        k+=1
+                if(exist):
+                    break
+                j+=1
+            if(not(exist)):
+                useless.append(i)
         i+=1
     minus=0
     for delete in useless:
@@ -436,24 +445,32 @@ def isCNF(cfg):
     return cnf
 
 def terminalExist(prod):
+    idx=[]
+    count=0
+    exist = False
     for unit in prod:
         if(terminalOrNot(unit)):
-            return True
-    return False
+            exist = True
+            idx.append(count)
+        count += 1
+    return exist,idx
 
 def ruleExist(cfg,rule):
     for lines in cfg:
-        if(len(lines)==len(rule)):
-            i=2
+        if(len(lines)-2==len(rule)):
+            i=0
             flag=True
-            while(i<len(lines)):
-                if(lines[i]!=rule[i]):
+            while(i<len(rule)):
+                print(lines)
+                print(rule)
+                print(i)
+                if(lines[i+2]!=rule[i]):
                     flag=False
                     break
                 i+=1
             if(flag):
-                return True
-    return False
+                return True, lines[0]
+    return False, None
 
 def productionExist(rule,prod):
     i=2
@@ -475,98 +492,142 @@ def terminalProdExist(cfg,terminal):
             return True,rule[0]
     return False,-1
 
+def CreateRule(cfg,prod,num):
+    new=[]
+    stri = 'T'+str(num)
+    new.append(stri)
+    new.append('->')
+    for unit in prod:
+        new.append(unit)
+    cfg.append(new)
+    return stri
+
 def convertToCNF(cfg):
     count=1
     # Get terminals
-    terminal=[]
-    for rules in cfg:
-        for prod in rules:
-            if(terminalOrNot(prod) and prod!='|' and prod!='->'):
-                i=0
-                exist=False
-                while(i<len(terminal)):
-                    if(terminal[i]==prod):
-                        exist=True
-                        break
-                    i+=1
-                if(not(exist)):
-                    terminal.append(prod)
-    
-    # # Create new terminal productions
-    # for prod in terminal:
-    #     new=[]
-    #     new.append(prod.upper()+'1')
-    #     new.append('->')
-    #     new.append(prod)
-    #     cfg.append(new)
+    # terminal=[]
+    # for rules in cfg:
+    #     for prod in rules:
+    #         if(terminalOrNot(prod) and prod!='|' and prod!='->'):
+    #             i=0
+    #             exist=False
+    #             while(i<len(terminal)):
+    #                 if(terminal[i]==prod):
+    #                     exist=True
+    #                     break
+    #                 i+=1
+    #             if(not(exist)):
+    #                 terminal.append(prod)
 
     # print("Sebelum diganti")
     # print(cfg)
+    num = 1
     for rules in cfg:
+        # print(rules[0])
         i=2
         prod=[]
         start=i
         # print("INI RULENYA:")
         # print(rules)
-        while(i<len(rules)):
-            if(rules[i]!='|'):
+        while i < len(rules):
+            if rules[i] != '|':
                 prod.append(rules[i])
-            i+=1
-            # print(prod)
-            # Change any terminal that's not a single terminal to a variable
-            if((i<len(rules) and rules[i]=='|') or i==len(rules)):
-                # print("INI PROD NYA")
-                # print(prod)
-                if(terminalExist(prod) and len(prod)>=2):
-                    j=start
-                    while(j<i):
-                        if(terminalOrNot(rules[j])):
-                            exist,var=terminalProdExist(cfg,rules[j])
-                            # If terminal prod already exist, change the terminal to the variable
-                            if(exist):
-                                rules[j]=var
-                            # If terminal prod doesn't exist, create new rule
-                            else:
-                                stri='T'+str(count)
-                                new=[]
-                                new.append(stri)
-                                new.append('->')
-                                new.append(rules[j])
-                                rules[j]='T'+str(count)
-                                cfg.append(new)
-                                count+=1
-                                # print("NEW term")
-                                # print(new)
-                        j+=1
-            
-                # Change any productions that has a length of 3 or more
-                if(len(prod)>2):
-                    # Create new rule
-                    j=start
-                    change=[]
-                    while(j<i-2):
-                        temp=rules.pop(j)
-                        change.append(temp)
-                        i-=1
-                    change.append(rules[j])
-                    # print("CHANGE")
-                    # print(change)
-                    stri='T'+str(count)
-                    count+=1
-                    new=[stri,'->']
-                    for unit in change:
-                        new.append(unit)
-                    # print("NEW")
-                    # print(new)
+            i += 1
+            if i >= len(rules) or rules[i] == '|':
+                # Check if there are no-term combined with term
+                exist,idx=terminalExist(prod)
+                if exist and len(prod) > 1:
+                        for id in idx:
+                            var = searchForTermRule(cfg,prod[id])
+                            prod[id] = var
+                            rules[start + id] = var
 
-                    # Check if the rule already exists
-                    if(not(ruleExist(cfg,new))):
-                        cfg.append(new)
-                    rules[j]=stri
-                i+=1
-                start=i
-                prod=[]
-    return cfg        
+                if rules[0] == 'T24':
+                        print(new)
+                # Change prod with length of 3 or more
+                if len(prod) > 2:
+                    new=[]
+                    id = 0
+                    while id < len(prod)-1:
+                        new.append(prod[id])
+                        id += 1
+                    
+                    exist,var = ruleExist(cfg,new)
+                    if not(exist):
+                        var = CreateRule(cfg,new,num)
+                        num += 1
+                    trav = start
+                    while trav < i-2:
+                        rules.pop(trav)
+                        i -= 1
+                    rules[trav] = var
+                start = i + 1
+                prod = []
+                i += 1
+    return cfg
+                    
+            
+
+        
+    #     while(i<len(rules)):
+    #         if(rules[i]!='|'):
+    #             prod.append(rules[i])
+    #         i+=1
+    #         # print(prod)
+    #         # Change any terminal that's not a single terminal to a variable
+    #         if((i<len(rules) and rules[i]=='|') or i==len(rules)):
+    #             # print("INI PROD NYA")
+    #             # print(prod)
+    #             if(terminalExist(prod) and len(prod)>=2):
+    #                 j=start
+    #                 while(j<i):
+    #                     if(terminalOrNot(rules[j])):
+    #                         print("test")
+    #                         exist,var=terminalProdExist(cfg,rules[j])
+    #                         # If terminal prod already exist, change the terminal to the variable
+    #                         if(exist):
+    #                             print(var)
+    #                             rules[j]=var
+    #                         # If terminal prod doesn't exist, create new rule
+    #                         else:
+    #                             stri='T'+str(count)
+    #                             new=[]
+    #                             new.append(stri)
+    #                             new.append('->')
+    #                             new.append(rules[j])
+    #                             rules[j]='T'+str(count)
+    #                             cfg.append(new)
+    #                             count+=1
+    #                     j+=1
+            
+    #             # Change any productions that has a length of 3 or more
+    #             if(len(prod)>2):
+    #                 # Create new rule
+    #                 j=start
+    #                 change=[]
+    #                 while(j<i-2):
+    #                     temp=rules.pop(j)
+    #                     change.append(temp)
+    #                     i-=1
+    #                 change.append(rules[j])
+    #                 # print("CHANGE")
+    #                 # print(change)
+    #                 stri='T'+str(count)
+    #                 count+=1
+    #                 new=[stri,'->']
+    #                 for unit in change:
+    #                     new.append(unit)
+    #                 # print("NEW")
+    #                 # print(new)
+
+    #                 # Check if the rule already exists
+    #                 if(not(ruleExist(cfg,new))):
+    #                     cfg.append(new)
+    #                 rules[j]=stri
+    #             i+=1
+    #             start=i
+    #             prod=[]
+    # return cfg        
 
 def displayCFG(cfg):
     for rules in cfg:
@@ -621,18 +682,18 @@ if __name__ == "__main__":
     # print("EPSILON")
     cfg=epsilonElimination(cfg)
     print("EPSILON KELAR")
-    # displayCFG(cfg)
-    # print("UNIT")
+    # # displayCFG(cfg)
+    # # print("UNIT")
     cfg=unitElimination(cfg)
     print("UNIT KELAR")
-    # displayCFG(cfg)
-    # print("USELESS")
+    # # displayCFG(cfg)
+    # # print("USELESS")
     cfg=uselessElimination(cfg)
     print("USELESS KELAR")
     # # displayCFG(cfg)
     # # print("CNF")
-    cfg=convertToCNF(cfg)
-    print("CNF KELAR")
+    # cfg=convertToCNF(cfg)
+    # print("CNF KELAR")
     # displayCFG(cfg)
     writeToFile("automata/result.txt",cfg)
     cnf=fileToCNF("automata/result.txt")
