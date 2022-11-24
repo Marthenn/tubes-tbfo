@@ -68,6 +68,11 @@ def __parse_call(word_list, call_cfg):
         list_len = len(word_list)
 
         if '.' in el and el[0] != '.' and el[len(el) - 1] != '.':
+
+            # if i + 1 < list_len and word_list[i+1] != '(':
+            #     is_obj_props = cyk.evaluate_cyk([word_list[i]], call_cfg)
+            #     pass
+
             end_idx = i
 
             while end_idx < list_len and word_list[end_idx] != ')':
