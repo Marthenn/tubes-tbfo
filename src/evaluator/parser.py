@@ -202,3 +202,27 @@ arr_3 = ['let', 'x', ';']
 lst = parse_with_fa(arr_rs, prod)
 
 print(' '.join(lst))
+
+def parse_comments(word_list, start_idx):
+    # this means the element at start_idx is a comment starter
+
+    # find the comment's last element
+
+    # remove elements from start_idx to end_dx (last comment's element)
+
+    # done!
+
+    if word_list[start_idx] != '//' or word_list[start_idx] != '/*':
+        return
+
+    if word_list[start_idx] == '//':
+        while word_list[start_idx] != '\n':
+            word_list.pop(start_idx)
+        word_list.pop(start_idx)
+        return
+
+    if word_list[start_idx] == '/*':
+        while word_list[start_idx] != '*/':
+            word_list.pop(start_idx)
+        word_list.pop(start_idx)
+        return
