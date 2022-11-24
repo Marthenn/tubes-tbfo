@@ -591,7 +591,7 @@ def writeToFile(file,cfg):
             i+=1
         file.write("\n")
 
-def FileToCNF(file):
+def fileToCNF(file):
     file=open(file,'r')
     lines = file.readlines()
     file.close()
@@ -599,7 +599,7 @@ def FileToCNF(file):
     for line in lines:
         line = line.strip()
         line = line.split()
-        prod = []
+        prod = set()
         production = ''
         for i in range(2,len(line)):
             if(line[i]!='|'):
@@ -607,16 +607,16 @@ def FileToCNF(file):
                     production+=' '
                 production += line[i]
             else:
-                prod.append(production)
+                prod.add(production)
                 production = ''
-        prod.append(production)
+        prod.add(production)
         cnf[line[0]] = prod
     return cnf
 
 
 if __name__ == "__main__":
-    #cfg=cfgToArray('automata/cfg.txt')
-    cfg=cfgToArray("automata/cfg.txt")
+    cfg=cfgToArray('automata/cfg.txt')
+    # cfg=cfgToArray("test.txt")
     # displayCFG(cfg)
     # print("EPSILON")
     cfg=epsilonElimination(cfg)
@@ -634,9 +634,10 @@ if __name__ == "__main__":
     cfg=convertToCNF(cfg)
     print("CNF KELAR")
     # displayCFG(cfg)
-    writeToFile("D:/Kuliah/TBFO/Tubes/tubes-tbfo/automata/result2.txt",cfg)
-    cnf=FileToCNF("D:/Kuliah/TBFO/Tubes/tubes-tbfo/automata/result2.txt")
-    # print(cnf)
+    writeToFile("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/resulta.txt",cfg)
+    cnf=fileToCNF("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/resulta.txt")
+    print(cnf)
+
     # #print(cfg)
     # terminals = getTerminal('automata/terminals.txt')
     # print(terminals)
