@@ -8,6 +8,9 @@ def getTerminal(name):
     file.close()
     return terminals
 
+def getTerminalSet(name):
+    return set(getTerminal(name))
+
  # Convert a text based CFG to an array
 def cfgToArray(name):
     file=open(name,'r')
