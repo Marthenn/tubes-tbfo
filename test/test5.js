@@ -52,7 +52,7 @@ function pen() {
     } else if (x +4 >>> 3==1) {
       if (lalaala) {
         return 3;
-      } else {
+      } else {  
           for (/* hiyah kosong bingung yah*/) {
               ++ta;
               break;

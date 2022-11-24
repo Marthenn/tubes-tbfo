@@ -36,6 +36,7 @@ while(j<15){
 
 try{
     console.log(j);
+    if(j==5){throw 'j is 5'}
 }
 catch(e){
     console.log(e);
