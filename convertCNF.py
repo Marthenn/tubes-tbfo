@@ -120,29 +120,42 @@ def removeUselessPipes(rule):
     
     # Remove pipe at the beginning
     # print(rule)
-    if(rule[0]!='OR'):
-        i=2
-        while(i < len(rule) and rule[i]=='|'):
-            temp=rule.pop(i)
+    i=2 
+    while rule[0] != 'OR' and (rule[i] == ' ' or rule[i] == '|'):
+        while rule[i] == ' ':
+            i += 1
+        if rule[i] == '|':
+            rule.pop(i)
+
+    # if(rule[0]!='OR'):
+    #     i=2
+    #     while(i < len(rule) and rule[i]=='|'):
+    #         temp=rule.pop(i)
 
     # Remove pipe at the end
-    while(rule[len(rule)-1]=='|'):
-        temp=rule.pop(len(rule)-1)
+    while(rule[len(rule)-1]=='|' or rule[len(rule)-1]==' '):
+        rule.pop(len(rule)-1)
     
     # Remove duplicate pipes
     pipe=False
     i=2
+    # print(rule)
     while(i<len(rule)):
-        if(pipe and rule[i]=='|'):
-            temp=rule.pop(i)
-        elif(rule[i]=='|'):
-            pipe=True
-            i+=1
-        elif rule[i] == ' ':
-            i+=1
+        if rule[i] == '|':
+            i += 1
+            
+            while rule[i] == '|':
+                temp=rule.pop(i)
         else:
-            pipe=False
             i+=1
+        # if(pipe and rule[i]=='|'):
+        #     temp=rule.pop(i)
+        # elif(rule[i]=='|'):
+        #     pipe=True
+        #     i+=1
+        # else:
+        #     pipe=False
+        #     i+=1
 
     return rule
 
@@ -184,6 +197,7 @@ def epsilonElimination(cfg):
                     removeAUnit(rule,i)
                 else:
                     i+=1
+            rule=removeUselessPipes(rule)
         cfg=removeEmpty(cfg)
 
         for rule in cfg:
@@ -215,16 +229,21 @@ def epsilonElimination(cfg):
                     
             rule=removeUselessPipes(rule)
             rule=deleteDuplicates(rule)
+    for rule in cfg:
+        rule=removeUselessPipes(rule)
     return cfg
 
 # Eliminating single unit productions
 def unitElimination(cfg):
     for line in cfg:
+        
         i=2
         start=i
         prod=[]
-        # count=0
+        count=0
         while(i<len(line)):
+            # if(count==100):
+            #     print(line)
             if(line[i]!='|'):
                 prod.append(line[i])
             i+=1
@@ -233,11 +252,14 @@ def unitElimination(cfg):
                     # print(temp)
                     replacement=searchForProd(cfg,prod[0])
                     # print(replacement)
+                    # if(count==100):
+                    #     print("REPLACE")
+                    #     print(replacement)
                     if(replacement!=None):
-                        temp=line.pop(start)
                         line.append('|')
                         for re in replacement:
                             line.append(re)
+                        line.pop(start)
                     else:
                         i+=1
                     # if(count<3):
@@ -250,34 +272,37 @@ def unitElimination(cfg):
                     i+=1
                 start=i
                 prod=[]
+            line=deleteDuplicates(line)
+            count+=1
         line=deleteDuplicates(line)
         line=removeUselessPipes(line)
+        
     return cfg
         
 
 # Eliminating useless variables
 def uselessElimination(cfg):
     # Check if rule produces a terminal
-    i=1
-    remove=[]
-    while(i<len(cfg)):
-        j=2
-        prod=[]
-        safe=False
-        while(j<len(cfg[i])):
-            if(cfg[i][j]!='|'):
-                prod.append(cfg[i][j])
-            j+=1
-            if(j==len(cfg[i]) or cfg[i][j]=='|'):
-                if(len(prod)==1 and terminalOrNot(prod[0])):
-                    safe=True
-                    break
-                j+=1
-                prod=[]
-        if(not(safe)):
-            temp=cfg.pop(i)
-        else:
-            i+=1
+    # i=1
+    # remove=[]
+    # while(i<len(cfg)):
+    #     j=2
+    #     prod=[]
+    #     safe=False
+    #     while(j<len(cfg[i])):
+    #         if(cfg[i][j]!='|'):
+    #             prod.append(cfg[i][j])
+    #         j+=1
+    #         if(j==len(cfg[i]) or cfg[i][j]=='|'):
+    #             if(len(prod)==1 and terminalOrNot(prod[0])):
+    #                 safe=True
+    #                 break
+    #             j+=1
+    #             prod=[]
+    #     if(not(safe)):
+    #         temp=cfg.pop(i)
+    #     else:
+    #         i+=1
     
     # Check if the variable exist in any RHS
     i=1
@@ -590,24 +615,27 @@ def fileToCNF(file):
 
 
 if __name__ == "__main__":
-    #cfg=cfgToArray('automata/cfg.txt')
-    cfg=cfgToArray("test.txt")
+    cfg=cfgToArray('automata/cfg.txt')
+    # cfg=cfgToArray("test.txt")
     # displayCFG(cfg)
     # print("EPSILON")
     cfg=epsilonElimination(cfg)
+    print("EPSILON KELAR")
     # displayCFG(cfg)
     # print("UNIT")
     cfg=unitElimination(cfg)
+    print("UNIT KELAR")
     # displayCFG(cfg)
     # print("USELESS")
     cfg=uselessElimination(cfg)
-    # displayCFG(cfg)
-    # print("CNF")
+    print("USELESS KELAR")
+    # # displayCFG(cfg)
+    # # print("CNF")
     cfg=convertToCNF(cfg)
+    print("CNF KELAR")
     # displayCFG(cfg)
-    writeToFile("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/resulta.txt",cfg)
-    cnf=fileToCNF("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/resulta.txt")
-    print(cnf)
+    writeToFile("automata/result.txt",cfg)
+    cnf=fileToCNF("automata/result.txt")
 
     # #print(cfg)
     # terminals = getTerminal('automata/terminals.txt')

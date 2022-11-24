@@ -214,15 +214,19 @@ def parse_comments(word_list, start_idx):
 
     if word_list[start_idx] != '//' or word_list[start_idx] != '/*':
         return
-
+    end_idx = start_idx
     if word_list[start_idx] == '//':
-        while word_list[start_idx] != '\n':
+        while word_list[end_idx] != '\n':
+            end_idx += 1
+        while start_idx <= end_idx:
             word_list.pop(start_idx)
-        word_list.pop(start_idx)
+            end_idx -= 1
         return
 
     if word_list[start_idx] == '/*':
-        while word_list[start_idx] != '*/':
+        while word_list[end_idx] != '*/':
+            end_idx += 1
+        while start_idx <= end_idx:
             word_list.pop(start_idx)
-        word_list.pop(start_idx)
+            end_idx -= 1
         return
