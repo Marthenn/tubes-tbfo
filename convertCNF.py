@@ -119,8 +119,11 @@ def removeEmpty(cfg):
 def removeUselessPipes(rule):
     
     # Remove pipe at the beginning
-    while(rule[2]=='|'):
-        temp=rule.pop(2)
+    # print(rule)
+    if(rule[0]!='OR'):
+        i=2
+        while(i < len(rule) and rule[i]=='|'):
+            temp=rule.pop(i)
 
     # Remove pipe at the end
     while(rule[len(rule)-1]=='|'):
@@ -135,6 +138,8 @@ def removeUselessPipes(rule):
         elif(rule[i]=='|'):
             pipe=True
             i+=1
+        elif rule[i] == ' ':
+            i+=1
         else:
             pipe=False
             i+=1
@@ -144,20 +149,23 @@ def removeUselessPipes(rule):
 # Check if an epsilon still exist in the CFG
 def epsilonExist(cfg):
     for rule in cfg:
-        for prod in rule:
-            if(prod=='EPSILON'):
-                return True
+        if(rule[0]!='EPSILON'):
+            for prod in rule:
+                if(prod=='EPSILON'):
+                    return True
     return False
 
 # Eliminating epsilon production
 def epsilonElimination(cfg):
+    count=0
     while(epsilonExist(cfg)):
+        # print("test")
         epsilons=[]
         for rule in cfg:
             i=2
             exist=False
             while(i<len(rule)):
-                if(i < len(rule) and rule[i]=='|'):
+                if(rule[i]=='|'):
                     i+=1
                 if(i < len(rule) and rule[i]=='EPSILON'):
                     exist=True
@@ -182,11 +190,14 @@ def epsilonElimination(cfg):
             i=2
             start=2
             while(i<len(rule)):
+                # print("test")w
                 for epsilon in epsilons:
+                    flag=False
                     if(rule[i]==epsilon):
                         # Check if the replaced unit is single or not
-                        if(i==start and (i==len(rule)-1 or (i+1<len(rule) and rule[i+1]=='|'))):
-                            # print("went in again")
+                        if(i==start and (i+1==len(rule) or rule[i+1]=='|') and epsilon!=rule[0]):
+                            # print(i)
+                            print("went in again")
                             j=start
                             rule.append('|')
                             rule.append('EPSILON')
@@ -197,11 +208,11 @@ def epsilonElimination(cfg):
                                 if(j!=i):
                                     rule.append(rule[j])
                                 j+=1
-                        break
                 i+=1
                 if(i<len(rule) and rule[i]=='|'):
                     i+=1
                     start=i
+                    
             rule=removeUselessPipes(rule)
             rule=deleteDuplicates(rule)
     return cfg
