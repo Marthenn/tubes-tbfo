@@ -66,7 +66,7 @@ def parse_fa_cfg(list_r):
 
 def parse_words(snt):
     special_group = ['//', '{', '}', '(', ')', '+', '-', '*', '%', '!', '<=', '>=', '>', '<', ';',
-                     '&&', '||', '==', '=', '\n', '?', '"', "'", '[', ']']
+                     '&&', '||', '==', '=', '\n', '?', '"', "'", '[', ']', ':']
 
     for special in special_group:
         snt = snt.replace(special, ' ' + special + ' ')
@@ -97,7 +97,7 @@ def parse_words_from_file(file_path):
     return list_of_words
 
 
-def parse_with_fa(word_list, prod):
+def parse_with_fa(word_list):
     in_ops, found_in = False, False
     variable_fa = automata.VariableAutomata()
     call_cfg = fileToCNF(
@@ -117,8 +117,15 @@ def parse_with_fa(word_list, prod):
 
         if found_in:
             found_in = False
-            __parse_assignable(word_list, i, call_cfg)
-            __parse_repeatable(word_list, i, prod)
+            tes = False
+            if word_list[i] == 'throw':
+                tes = True
+
+            __parse_assignable(word_list, i)
+            __parse_repeatable(word_list, i)
+
+            if tes:
+                print(word_list[i])
 
             continue
 
@@ -129,7 +136,7 @@ def parse_with_fa(word_list, prod):
                 word_list[i] = 'var_name'
                 continue
 
-        __parse_expr(word_list, i, call_cfg)
+        __parse_expr(word_list, i)
 
     return word_list
 
@@ -181,7 +188,7 @@ def __parse_call(word_list, call_cfg, t_set):
             continue
 
 
-def __parse_repeatable(word_list, start_idx, prod):
+def __parse_repeatable(word_list, start_idx):
     if word_list[start_idx] != '(':
         return
 
@@ -199,18 +206,18 @@ def __parse_repeatable(word_list, start_idx, prod):
     while end_idx + 1 < len_list and not (word_list[end_idx] == ')' and word_list[end_idx + 1] != ')'):
         end_idx += 1
 
-    list_fa = parse_with_fa(word_list[start_idx + repeating + 1:end_idx - repeating], prod)
+    list_fa = parse_with_fa(word_list[start_idx + repeating + 1:end_idx - repeating])
     word_list[start_idx + 1:end_idx] = list_fa
 
 
-def __parse_assignable(word_list, start_idx, call_cfg):
+def __parse_assignable(word_list, start_idx):
     if word_list[start_idx] != '=':
         return
 
-    __parse_expr(word_list, start_idx + 1, call_cfg)
+    __parse_expr(word_list, start_idx + 1)
 
 
-def __parse_expr(word_list, start_idx, call_cfg):
+def __parse_expr(word_list, start_idx):
     expr_fa = automata.OperationAutomata()
     ternary_fa = automata.TernaryAutomata()
     end_idx = start_idx
@@ -219,20 +226,23 @@ def __parse_expr(word_list, start_idx, call_cfg):
     literal = ''
     in_literal = False
     ternary = False
+    check = False
 
-    while end_idx < list_len and word_list[end_idx] != ';' and (word_list[end_idx] != ')' or not (
+    while end_idx < list_len and word_list[end_idx] != ';' and word_list[end_idx] != ':' and (word_list[end_idx] != ')' or not (
             word_list[end_idx] == ')' and end_idx + 1 < list_len and (
             word_list[end_idx + 1] == '{' or word_list[end_idx + 1] == ';'))):
         word = word_list[end_idx]
 
         if (word == '"' or word == "'") and in_literal:
             eval_list.append(literal + word)
+            check = True
             literal = ''
             in_literal = False
             end_idx += 1
             continue
 
         if (word == '"' or word == "'") and not in_literal:
+
             in_literal = True
 
         if in_literal:
@@ -252,6 +262,9 @@ def __parse_expr(word_list, start_idx, call_cfg):
         return
 
     eval_s = ternary_fa.evaluate(eval_list) if ternary else expr_fa.evaluate(eval_list)
+
+    if check:
+        print(eval_s, eval_list, 'GAGAL')
 
     if not eval_s:
         return
@@ -286,7 +299,9 @@ if __name__ == '__main__':
     arr_2 = ['x', '=', 'konts', '+', '3', '===', '9', '+', ';']
     arr_3 = ['let', 'x', ';']
 
-    lst = parse_with_fa(arr_rs, prod)
+    lst = parse_with_fa(arr_rs)
+
+    print(' '.join(lst))
 
     for idx in range(len(lst) - 1, -1, -1):
         if lst[idx] == '' or lst[idx] == '\n' or lst[idx] == ';':
