@@ -21,7 +21,7 @@ for(var i=0;i<10;i++){
 
 // SINGLE LINE COMMENT
 
-/* 
+/*
 MULTILINE COMMENT
 AJSDFK;A
 asdfafd
@@ -45,28 +45,27 @@ console.log(aa);
 console.log(a);
 
 function pen() {
-    if (x <= 0) {
-      x = 2 + 5;
-      x = 25  ;
-      return 0;
-    } else if (x +4 >>> 3==1) {
-      if (lalaala) {
-        return 3;
-      } else {
-          for (let bai = 0; bai < 1000; ++bai) {
-              ++ta;
-              break;
-          }
-        return (((((((++x)))))));
-      }
-    } else if (x == ((((32))))) {
-      return 2 + x + (x + 6) ? "ta" : (x + 9) ? "boh" : "seeh";
+  if (x <= 0) {
+    x = 2 + 5;
+    x = 25  ;
+    return 0;
+  } else if (x +4 >>> 3==1) {
+    if (lalaala) {
+      return 3;
     } else {
-      return 'Momol';
+        for (let bai = 0; bai < 1000; ++bai) {
+          ++ta;
+          break;
+        }
+      return (((((((++x)))))));
     }
+  } else if (x == ((((32))))) {
+    return 2 + x + (x + 6) ? "ta" : (x + 9) ? "boh" : "seeh";
+  } else {
+    return 'Momol';
   }
-  
-  
-  let bla = 2 + x + (x + 6) ? "ti" : (x + 9) ? "boh" : "sh deh";
-  
-  let sh = ++x;
+}
+
+let bla = 2 + x + (x + 6) ? "ti" : (x + 9) ? "boh" : "sh deh";
+ 
+let sh = ++x;

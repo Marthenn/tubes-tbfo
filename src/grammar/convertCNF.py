@@ -9,7 +9,7 @@ def getTerminal(name):
     return terminals
 
 def getTerminalSet(name):
-    return set(getTerminal(name))
+    return set(getTerminal(name))   
 
  # Convert a text based CFG to an array
 def cfgToArray(name):
@@ -41,7 +41,6 @@ def searchForTermRule(cfg,term):
             if rules[2] == term:
                 return rules[0]
     
-
 #Determine whether the symbol is a terminal or a variable
 def terminalOrNot(unit):
     terminals=getTerminal('automata/terminals.txt')
@@ -222,7 +221,7 @@ def epsilonElimination(cfg):
                         # Check if the replaced unit is single or not
                         if(i==start and (i+1==len(rule) or rule[i+1]=='|') and epsilon!=rule[0]):
                             # print(i)
-                            print("went in again")
+                            # print("went in again")
                             j=start
                             rule.append('|')
                             rule.append('EPSILON')
@@ -253,8 +252,6 @@ def unitElimination(cfg):
         prod=[]
         count=0
         while(i<len(line)):
-            # if(count==100):
-            #     print(line)
             if(line[i]!='|'):
                 prod.append(line[i])
             i+=1
@@ -464,9 +461,9 @@ def ruleExist(cfg,rule):
             i=0
             flag=True
             while(i<len(rule)):
-                print(lines)
-                print(rule)
-                print(i)
+                # print(lines)
+                # print(rule)
+                # print(i)
                 if(lines[i+2]!=rule[i]):
                     flag=False
                     break
@@ -474,26 +471,6 @@ def ruleExist(cfg,rule):
             if(flag):
                 return True, lines[0]
     return False, None
-
-def productionExist(rule,prod):
-    i=2
-    current=[]
-    while(i<len(rule)):
-        if(rule[i]!='|'):
-            current.append(rule[i])
-        i+=1
-        if((i<len(rule) and rule[i]=='|') or i==len(rule)):
-            if(current==prod):
-                return True
-            i+=1
-            current=[]
-    return False
-
-def terminalProdExist(cfg,terminal):
-    for rule in cfg:
-        if(len(rule)==3 and rule[2]==terminal):
-            return True,rule[0]
-    return False,-1
 
 def CreateRule(cfg,prod,num):
     new=[]
@@ -506,24 +483,6 @@ def CreateRule(cfg,prod,num):
     return stri
 
 def convertToCNF(cfg):
-    count=1
-    # Get terminals
-    # terminal=[]
-    # for rules in cfg:
-    #     for prod in rules:
-    #         if(terminalOrNot(prod) and prod!='|' and prod!='->'):
-    #             i=0
-    #             exist=False
-    #             while(i<len(terminal)):
-    #                 if(terminal[i]==prod):
-    #                     exist=True
-    #                     break
-    #                 i+=1
-    #             if(not(exist)):
-    #                 terminal.append(prod)
-
-    # print("Sebelum diganti")
-    # print(cfg)
     num = 1
     for rules in cfg:
         # print(rules[0])
@@ -545,8 +504,8 @@ def convertToCNF(cfg):
                             prod[id] = var
                             rules[start + id] = var
 
-                if rules[0] == 'T24':
-                        print(new)
+                # if rules[0] == 'T24':
+                #         print(new)
                 # Change prod with length of 3 or more
                 if len(prod) > 2:
                     new=[]
@@ -632,17 +591,15 @@ def convertToCNF(cfg):
     #             prod=[]
     # return cfg        
 
-def displayCFG(cfg):
-    for rules in cfg:
-        i=0
-        while(i<len(rules)):
-            print(rules[i], end="")
-            if(i!=len(rules)):
-                print(" ",end="")
-            i+=1
-        print("\n")
-
-    
+# def displayCFG(cfg):
+#     for rules in cfg:
+#         i=0
+#         while(i<len(rules)):
+#             print(rules[i], end="")
+#             if(i!=len(rules)):
+#                 print(" ",end="")
+#             i+=1
+#         print("\n")
 
 def writeToFile(file,cfg):
     file=open(file,"w")
@@ -684,22 +641,23 @@ if __name__ == "__main__":
     # displayCFG(cfg)
     # print("EPSILON")
     cfg=epsilonElimination(cfg)
-    print("EPSILON KELAR")
-    # # displayCFG(cfg)
-    # # print("UNIT")
+    # print("EPSILON KELAR")
+    # # # displayCFG(cfg)
+    # # # print("UNIT")
     cfg=unitElimination(cfg)
-    print("UNIT KELAR")
-    # # displayCFG(cfg)
-    # # print("USELESS")
+    # print("UNIT KELAR")
+    # # # displayCFG(cfg)
+    # # # print("USELESS")
     cfg=uselessElimination(cfg)
-    print("USELESS KELAR")
+    # print("USELESS KELAR")
     # # displayCFG(cfg)
     # # print("CNF")
-    # cfg=convertToCNF(cfg)
+    cfg=convertToCNF(cfg)
     # print("CNF KELAR")
     # displayCFG(cfg)
     writeToFile("automata/result.txt",cfg)
     cnf=fileToCNF("automata/result.txt")
+    # print(cfg)
 
     # #print(cfg)
     # terminals = getTerminal('automata/terminals.txt')

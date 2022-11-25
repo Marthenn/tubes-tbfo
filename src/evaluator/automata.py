@@ -155,7 +155,7 @@ class OperationAutomata(Automata, ABC):
                            ('S3', 'NUM'): 'S4',
                            ('S3', 'VAR'): 'S5',
                            ('S3', 'F_CALL'): 'S4',
-                           ('S3', 'URE_PRE'): 'S3',
+                           ('S3', 'URY_PRE'): 'S3',
                            ('S3', 'URY_POST_PRE_NU'): 'S3',
                            ('S3', 'LLS'): 'S4',
                            ('S4', 'COMP_OPS'): 'S1',
