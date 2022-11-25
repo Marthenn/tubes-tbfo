@@ -23,7 +23,7 @@ function findBook(bookId) {
 }
 
 function findBookIndex(bookId) {
-    for (const index in allBooks) {
+    for ( ; ; ) {
         if (allBooks[index].id === bookId) {
             return index;
         }
@@ -32,7 +32,7 @@ function findBookIndex(bookId) {
 }
 
 function isStorageExist() {
-    if (typeof (Storage) === undefined) {
+    if ((Storage) === undefined) {
         alert('Browser kamu tidak mendukung local storage');
         return false;
     }
