@@ -1,5 +1,5 @@
-epsilon
 if
+expr
 else
 switch
 case
@@ -17,10 +17,6 @@ delete
 const
 let
 var
-true
-false
-NaN
-null
 function
 (
 )
