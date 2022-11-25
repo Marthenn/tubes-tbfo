@@ -119,7 +119,7 @@ function editBook(id){
         } else {
             target.isCompleted = false;
         }
-        alert(`Buku dengan judul berhasil diubah`);
+        alert('Buku dengan judul berhasil diubah');
         saveData();
     }
     searchBook();
