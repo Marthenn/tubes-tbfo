@@ -34,10 +34,8 @@ class VariableAutomata(Automata, ABC):
 
         # generate list of alphabets (lower and upper case)
         nums = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}
-        last_char = ''
 
         for char in variable_name:
-            last_char = char
             fa_input = 'IN' if char in nums else 'NIN'
 
             if char not in allowed:
@@ -54,7 +52,7 @@ class VariableAutomata(Automata, ABC):
         if current_state in self.accept_states:
             res = True
 
-        return res, last_char
+        return res
 
 
 # unfortunately we made the dfa without ternary in consideration, so rather than reconstructing the correct dfa,
@@ -92,7 +90,6 @@ class TernaryAutomata(Automata, ABC):
             current_state = self.transition.get(transition_tuple)
 
             if current_state is None:
-                print(transition_tuple, el)
                 return False
 
         return True
@@ -126,7 +123,7 @@ class OperationAutomata(Automata, ABC):
         self.states = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7', 'S8', 'S9', 'S10', 'S11']
         self.alphabets = ['F_CALL', 'VAR', 'NUM', 'LLS', 'URY_PRE', 'URY_POST', 'COMP_OPS', 'BIN_OPS']
         self.start_state = self.states[0]
-        self.accept_states = ['S2', 'S6', 'S7', 'S8', 'S9', 'S4']
+        self.accept_states = ['S2', 'S6', 'S7', 'S8', 'S9', 'S4', 'S5']
         self.transition = {('S1', 'VAR'): 'S2',
                            ('S2', 'BIN_OPS'): 'S3',
                            ('S2', 'BIN_URY_PRE'): 'S3',
@@ -139,7 +136,7 @@ class OperationAutomata(Automata, ABC):
                            ('S1', 'F_CALL'): 'S7',
                            ('S7', 'COMP_OPS'): 'S3',
                            ('S7', 'BIN_OPS'): 'S3',
-                           ('S7', 'BIN_OPS_PRE'): 'S3',
+                           ('S7', 'BIN_URY_PRE'): 'S3',
                            ('S1', 'URY_PRE'): 'S10',
                            ('S1', 'BIN_URY_PRE'): 'S10',
                            ('S10', 'F_CALL'): 'S8',
@@ -148,18 +145,28 @@ class OperationAutomata(Automata, ABC):
                            ('S10', 'LLS'): 'S8',
                            ('S1', 'URY_POST_PRE_NU'): 'S11',
                            ('S11', 'VAR'): 'S8',
+                           ('S8', 'COMP_OPS'): 'S3',
+                           ('S8', 'BIN_OPS'): 'S3',
+                           ('S8', 'BIN_URY_PRE'): 'S3',
                            ('S1', 'LLS'): 'S9',
                            ('S9', 'BIN_OPS'): 'S3',
                            ('S9', 'BIN_URY_PRE'): 'S3',
                            ('S9', 'COMP_OPS'): 'S3',
                            ('S3', 'NUM'): 'S4',
-                           ('S3', 'VAR'): 'S4',
+                           ('S3', 'VAR'): 'S5',
                            ('S3', 'F_CALL'): 'S4',
+                           ('S3', 'URE_PRE'): 'S3',
+                           ('S3', 'URY_POST_PRE_NU'): 'S3',
                            ('S3', 'LLS'): 'S4',
                            ('S4', 'COMP_OPS'): 'S1',
                            ('S4', 'BIN_OPS'): 'S1',
-                           ('S4', 'URY_POST_PRE_NU'): 'S1',
-                           ('S4', 'BIN_URY_PRE'): 'S1'}
+                           # ('S4', 'URY_POST_PRE_NU'): 'S1',
+                           ('S4', 'BIN_URY_PRE'): 'S1',
+                           ('S5', 'URY_POST_PRE_NU'): 'S5',
+                           ('S5', 'COMP_OPS'): 'S1',
+                           ('S5', 'BIN_OPS'): 'S1',
+                           # ('S5', 'URY_POST_PRE_NU'): 'S1',
+                           ('S5', 'BIN_URY_PRE'): 'S1'}
         self.operators = {'COMP_OPS': {'==', '!=', '===', '!==', '>', '>=', '<', '<='},  # comparison operators
                           'BIN_OPS': {'*', '/', '%', '**', '&', '|', '^', '<<', '>>', '>>>', '&&', '||'},
                           # binary operators
@@ -176,10 +183,9 @@ class OperationAutomata(Automata, ABC):
         fa_input = None
 
         for i, el in enumerate(expression_list):
-            fa_input = self.__get_input(el)
+            fa_input = self.__get_input(expression_list[i])
 
             transition_tuple = (current_state, fa_input)
-            # print(current_state, fa_input)
             current_state = self.transition.get(transition_tuple)
 
             if current_state is None:
@@ -195,9 +201,11 @@ class OperationAutomata(Automata, ABC):
     def __get_input(self, el):
         fa_input = None
 
-        if el == 'FUNCTION_CALL':
-            fa_input = 'F_CALL'
-        elif self.var_checker.evaluate(el)[0]:
+        # check for func call
+        if el == 'func_call':
+            return 'F_CALL'
+
+        if self.var_checker.evaluate(el):
             fa_input = 'VAR'
         elif (el[0] == "'" and el[len(el) - 1] == "'") or (el[0] == '"' and el[len(el) - 1] == '"'):
             fa_input = 'LLS'
@@ -220,11 +228,6 @@ if __name__ == '__main__':
     evaluator_exp = OperationAutomata()
     evaluator_var = VariableAutomata()
     evaluator_ternary = TernaryAutomata()
-    # expresyen = 'variable_name'
-    # print(expresyen)
-    # print(evaluator_exp.evaluate(expresyen.split(' ')))
-    # var_name = '==='
-    # print(evaluator_var.evaluate(var_name))
-    inp = 'x > 2 ? x + 3 : 1'.split(' ')
-    print(inp)
-    print(evaluator_ternary.evaluate(inp))
+    expresyen = '++ x'.split(' ')
+    ls = 'func_call + func_call'
+    print(evaluator_exp.evaluate(expresyen))
