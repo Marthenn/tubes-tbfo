@@ -123,6 +123,8 @@ def parse_words_from_file(file_path):
 
 
 def parse_with_fa(word_list):
+    if(len(word_list) == 0):
+        return word_list
     in_ops, found_in = False, False
     variable_fa = automata.VariableAutomata()
     call_cfg = convertCNF.fileToCNF(

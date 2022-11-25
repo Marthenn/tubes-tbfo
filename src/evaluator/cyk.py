@@ -3,6 +3,8 @@
 def evaluate_cyk(code_arr, cnf, start_var):
     cnf_k_list = cnf.keys()
     code_len = len(code_arr)
+    if code_len == 0:
+        return True
     arr_table = [['!' for _ in range(code_len - i)] for i in range(code_len)]
 
     # iterate string length 1 to code_len

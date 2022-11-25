@@ -25,7 +25,7 @@ if __name__ == "__main__":
         if lst[idx] == '' or lst[idx] == ';':
             lst.pop(idx)
 
-    # print(' '.join(lst))
+    #print(' '.join(lst))
 
     for idx in range(len(lst) - 1, -1, -1):
         if lst[idx] == '' or lst[idx] == '\n' or lst[idx] == ';':
