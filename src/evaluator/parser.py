@@ -132,10 +132,10 @@ def parse_with_fa(word_list):
     in_ops, found_in = False, False
     variable_fa = automata.VariableAutomata()
     call_cfg = fileToCNF(
-        "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/fa_res.txt")
+        "D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/terminal_cnf.txt")
 
     t_setx = getTerminalSet(
-        '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/terminal_no_ops.txt')
+        'D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/terminal_no_ops.txt')
 
     __parse_call(word_list, call_cfg, t_setx)
 
@@ -282,7 +282,7 @@ def __parse_expr(word_list, start_idx, asn):
     ternary = False
 
     t_set = getTerminalSet(
-        '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/terminal_no_ops.txt')
+        'D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/terminal_no_ops.txt')
     rb_ex = {'{', ';'}
 
     if asn:
@@ -371,11 +371,8 @@ prod = {'IF': 'if',
 if __name__ == '__main__':
     x = time.time()
 
-    cnf = fileToCNF(
-        "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/res.txt")
-    arr_rs = (
-        parse_words_from_file(
-            '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt'))
+    cnf = fileToCNF("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/result.txt")
+    arr_rs = (parse_words_from_file("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/test/test6.js"))
 
     lst = parse_with_fa(arr_rs)
 
