@@ -1,6 +1,3 @@
-import time
-
-# from grammar.convertCNF import fileToCNF, getTerminalSet
 from src.evaluator import automata
 from src.evaluator import cyk
 
@@ -392,29 +389,5 @@ def run_test(cnf_path, file_path):
 if __name__ == '__main__':
     result = run_test("/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/res.txt",
              '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt')
-    print(result
-          )
-    # cnf = convertCNF.fileToCNF(
-    #     "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/res.txt")
-    # arr_rs = (
-    #     parse_words_from_file(
-    #         '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt'))
-
-
-    # lst = parse_with_fa(arr_rs)
-    #
-    # for idx in range(len(lst) - 1, -1, -1):
-    #     if lst[idx] == '' or lst[idx] == ';':
-    #         lst.pop(idx)
-    #
-    # print(' '.join(lst))
-    #
-    # for idx in range(len(lst) - 1, -1, -1):
-    #     if lst[idx] == '' or lst[idx] == '\n' or lst[idx] == ';':
-    #         lst.pop(idx)
-    #
-    # if len(lst) != 0:
-    #     print(cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE'))
-    # else:
-    #     print('length is 0, accepted')
+    print(result)
 
