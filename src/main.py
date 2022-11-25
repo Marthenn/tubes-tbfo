@@ -1,9 +1,10 @@
+import sys,os
+sys.path.insert(0,os.path.abspath(os.curdir))
 from src.evaluator import automata
 from src.evaluator import cyk
 from src.evaluator import *
 from src.evaluator.parser import *
 from src.grammar.convertCNF import *
-import sys,os
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
