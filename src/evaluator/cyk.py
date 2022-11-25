@@ -1,6 +1,6 @@
 
 
-def evaluate_cyk(code_arr, cnf):
+def evaluate_cyk(code_arr, cnf, start_var):
     cnf_k_list = cnf.keys()
     code_len = len(code_arr)
     arr_table = [['!' for _ in range(code_len - i)] for i in range(code_len)]
@@ -35,6 +35,8 @@ def evaluate_cyk(code_arr, cnf):
                 else:
                     arr_table[0][j] = str_pos
 
+                continue
+
             else:
                 r_idx = i - 1
                 str_pos = set()
@@ -52,11 +54,12 @@ def evaluate_cyk(code_arr, cnf):
                                 if c_str in cnf.get(el):
                                     str_pos.add(el)
 
-                    if len(str_pos) == 0:
-                        arr_table[r_idx][j] = str_pos
-                    else:
-                        arr_table[r_idx][j] = str_pos
+                    arr_table[r_idx][j] = str_pos
 
-    return True if 'S' in arr_table[len(list) - 1][0] else False
+    # print(
+    #     '\n'.join(
+    #         '{0: <16}'.format(str(arr_table[k])[1:len(str(arr_table[k])) - 1]) for k in range(len(arr_table) - 1, -1, -1)))
+
+    return True if start_var in arr_table[len(code_arr) - 1][0] else False
 
 
