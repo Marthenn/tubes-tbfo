@@ -4,7 +4,6 @@ expr
 else
 switch
 case
-var_name
 break
 default
 for
@@ -32,3 +31,6 @@ function
 ;
 \n
 ,
+:
+[
+]
