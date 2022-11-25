@@ -52,6 +52,7 @@ def parse_fa_cfg(list_r):
                     parse[j:end_idx + 1] = [''.join(parse[j:end_idx + 1])]
 
             val_x = aus.evaluate(parse)
+
             if val_x:
                 sp_list[i] = 'expr'
                 continue
@@ -105,7 +106,9 @@ def parse_with_fa(word_list, prod):
     t_setx = getTerminalSet(
         '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/terminal_no_ops.txt')
 
-    __parse_call(word_list, call_cfg)
+    __parse_call(word_list, call_cfg, t_setx)
+
+    print(word_list)
 
     for i, el in enumerate(word_list):
 
@@ -131,20 +134,11 @@ def parse_with_fa(word_list, prod):
     return word_list
 
 
-def __parse_call(word_list, call_cfg):
+def __parse_call(word_list, call_cfg, t_set):
     for i, el in enumerate(word_list):
         list_len = len(word_list)
 
-        if '.' in el and el[0] != '.' and el[len(el) - 1] != '.' and not (i + 1 < list_len and word_list[i + 1] == '['):
-
-            if (i + 1 < list_len and word_list[i + 1] != '(') or i + 1 == list_len:
-
-                is_obj_props = cyk.evaluate_cyk(parse_fa_cfg([word_list[i]]), call_cfg, 'FUNCTION_CALL')
-
-                if is_obj_props:
-                    word_list[i] = 'func_call'
-                continue
-
+        if i + 1 < list_len and word_list[i + 1] == '(' and not (i - 1 >= 0 and (word_list[i] in t_set or word_list[i-1] in t_set)):
             end_idx = i
 
             while end_idx < list_len and word_list[end_idx] != ')':
@@ -160,25 +154,31 @@ def __parse_call(word_list, call_cfg):
 
             continue
 
-        # not function call and not a list access
-        if (i + 1 < list_len and word_list[i + 1] != '[') or i + 1 >= list_len:
+        if i + 1 < list_len and word_list[i + 1] == '[':
+            end_idx = i
+
+            while end_idx < list_len and word_list[end_idx] != ']':
+                end_idx += 1
+
+            if end_idx == list_len:
+                continue
+
+            parsed = parse_fa_cfg(word_list[i:end_idx + 1])
+
+            is_list_acc = cyk.evaluate_cyk(parsed, call_cfg, 'FUNCTION_CALL')
+
+            if is_list_acc:
+                word_list[i:end_idx + 1] = ['func_call']
+
             continue
 
-        # parse for list access
-        end_idx = i
+        if '.' in el and el[0] != '.' and el[len(el)-1] != '.':
+            is_obj_props = cyk.evaluate_cyk(parse_fa_cfg([word_list[i]]), call_cfg, 'FUNCTION_CALL')
 
-        while end_idx < list_len and word_list[end_idx] != ']':
-            end_idx += 1
+            if is_obj_props:
+                word_list[i] = 'func_call'
 
-        if end_idx == list_len:
             continue
-
-        parsed = parse_fa_cfg(word_list[i:end_idx + 1])
-
-        is_list_acc = cyk.evaluate_cyk(parsed, call_cfg, 'FUNCTION_CALL')
-
-        if is_list_acc:
-            word_list[i:end_idx + 1] = ['func_call']
 
 
 def __parse_repeatable(word_list, start_idx, prod):
@@ -288,14 +288,10 @@ if __name__ == '__main__':
 
     lst = parse_with_fa(arr_rs, prod)
 
-    # print(' '.join(lst))
-
     for idx in range(len(lst) - 1, -1, -1):
         if lst[idx] == '' or lst[idx] == '\n' or lst[idx] == ';':
             lst.pop(idx)
 
-    print(lst)
-    #
     print(cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE'))
     # y = time.time()
 
