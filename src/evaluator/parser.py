@@ -6,14 +6,6 @@ from src.evaluator import cyk
 
 
 def parse_comments(word_list, start_idx):
-    # this means the element at start_idx is a comment starter
-
-    # find the comment's last element
-
-    # remove elements from start_idx to end_dx (last comment's element)
-
-    # done!
-
     if word_list[start_idx] != '//' and word_list[start_idx] != '/*':
         return
 
@@ -187,7 +179,7 @@ def parse_with_fa(word_list):
 
 
 def __parse_call(word_list, call_cfg, t_set):
-    ex_set = {';', '{', '(', 'return'}
+    ex_set = {';', '{', '(', 'return', '='}
     for i, el in enumerate(word_list):
         list_len = len(word_list)
 
@@ -208,6 +200,9 @@ def __parse_call(word_list, call_cfg, t_set):
                     enc_count += 1
                 elif word_list[end_idx] == ')':
                     enc_count -= 1
+
+                    if enc_count == 0:
+                        end_idx -= 1
 
                 end_idx += 1
 
@@ -241,7 +236,6 @@ def __parse_call(word_list, call_cfg, t_set):
                 continue
 
             parsed = parse_fa_cfg(word_list[i:end_idx + 1])
-            print(parsed)
 
             is_list_acc = cyk.evaluate_cyk(parsed, call_cfg, 'FUNCTION_CALL')
 
@@ -278,11 +272,7 @@ def __parse_repeatable(word_list, start_idx):
     while end_idx + 1 < len_list and not (word_list[end_idx] == ')' and word_list[end_idx + 1] != ')'):
         end_idx += 1
 
-    for i in range(end_idx, start_idx, -1):
-        print(word_list[i])
-
     list_fa = parse_with_fa(word_list[start_idx + repeating + 1:end_idx - repeating])
-    print(list_fa, 'RIPITEBEL', word_list[start_idx + repeating + 1:end_idx - repeating], repeating)
     word_list[start_idx + 1:end_idx] = list_fa
 
 
@@ -411,7 +401,10 @@ if __name__ == '__main__':
         if lst[idx] == '' or lst[idx] == '\n' or lst[idx] == ';':
             lst.pop(idx)
 
-    print(cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE'))
+    if len(lst) != 0:
+        print(cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE'))
+    else:
+        print('length is 0, accepted')
     # y = time.time()
 
     # print(y - x)
