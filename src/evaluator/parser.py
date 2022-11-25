@@ -105,6 +105,8 @@ def parse_with_fa(word_list, prod):
     t_setx = getTerminalSet(
         '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/terminal_no_ops.txt')
 
+    __parse_call(word_list, call_cfg)
+
     for i, el in enumerate(word_list):
 
         if el in t_setx:
@@ -248,8 +250,6 @@ def __parse_expr(word_list, start_idx, call_cfg):
 
     if not end_idx < list_len:
         return
-
-    __parse_call(eval_list, call_cfg)
 
     eval_s = ternary_fa.evaluate(eval_list) if ternary else expr_fa.evaluate(eval_list)
 
