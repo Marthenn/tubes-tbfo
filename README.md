@@ -4,7 +4,7 @@ Tugas besar IF2124 - Teori Bahasa Formal dan Otomata menugaskan mahasiswa untuk 
 ## How to Run
 1. Arahkan terminal pada direktori utama
 2. Buat sebuah file dengan ekstensi .js yang berisi snippet program JavaScript yang ingin dicek
-3. Jalankan perintah `python main.py <nama_file>.js` pada terminal
+3. Jalankan perintah `python main.py <js_file_path>` pada terminal
 
 ## Contributors
 1. [13521141 - Edia Zaki Naufal Ilman](https://github.com/Ezaaan)
