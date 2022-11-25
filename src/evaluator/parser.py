@@ -96,13 +96,13 @@ def parse_fa_cfg(list_r):
 
 
 def parse_words(snt):
-    special_group = ['//', '{', '}', '(', ')', '+', '-', '*', '/', '%', '!', '<=', '>=', '>', '<', ';',
-                     '&&', '||', '==', '=', '\n', '?', '"', "'", '[', ']', ':', ',']
+    special_group = ['//', '{', '}', '(', ')', '+', '-', '*', '/', '%', '!', '>', '<', ';',
+                     '&&', '||', '=', '\n', '?', '"', "'", '[', ']', ':', ',']
 
     for special in special_group:
         snt = snt.replace(special, ' ' + special + ' ')
 
-    special_group_multiple = ['=  =  =', '=  =', '!  =', '!  =  =', '>  =', '<  =', '*  *', '>  >  >', '<  <',
+    special_group_multiple = ['=  =  =', '!  =  =', '=  =', '!  =',  '>  =', '<  =', '*  *', '>  >  >', '<  <',
                               '>  >', '&  &', '|  |', '+  +', '-  -', '/  /', '*  /', '/  *']
 
     for special_mltp in special_group_multiple:
@@ -198,16 +198,33 @@ def __parse_call(word_list, call_cfg, t_set):
                                                                                  (word_list[i - 1] in t_set and
                                                                                   word_list[i - 1] not in ex_set))):
             end_idx = i
-            while end_idx < list_len and word_list[end_idx] != ')':
+            enc_count = 0
+            cont = True
+            encd = False
+
+            while cont:
+                if word_list[end_idx] == '(':
+                    encd = True
+                    enc_count += 1
+                elif word_list[end_idx] == ')':
+                    enc_count -= 1
+
                 end_idx += 1
+
+                if (enc_count == 0 and encd) or end_idx >= list_len:
+                    cont = False
+                # end_idx < list_len and word_list[end_idx] != ')'
 
             if end_idx == list_len:
                 continue
 
-            if word_list[i] == 'document.getElementById':
-                print(word_list[i:end_idx], 'HAHAYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY')
+            cfg_r = parse_fa_cfg(word_list[i:end_idx + 1])
 
-            is_func_call = cyk.evaluate_cyk(parse_fa_cfg(word_list[i:end_idx + 1]), call_cfg, 'FUNCTION_CALL')
+            for idx in range(len(cfg_r) - 1, -1, -1):
+                if cfg_r[idx] == '' or cfg_r[idx] == '\n' or cfg_r[idx] == ';':
+                    cfg_r.pop(idx)
+
+            is_func_call = cyk.evaluate_cyk(cfg_r, call_cfg, 'FUNCTION_CALL')
 
             if is_func_call:
                 word_list[i:end_idx + 1] = ['func_call']
@@ -224,6 +241,7 @@ def __parse_call(word_list, call_cfg, t_set):
                 continue
 
             parsed = parse_fa_cfg(word_list[i:end_idx + 1])
+            print(parsed)
 
             is_list_acc = cyk.evaluate_cyk(parsed, call_cfg, 'FUNCTION_CALL')
 
@@ -260,7 +278,11 @@ def __parse_repeatable(word_list, start_idx):
     while end_idx + 1 < len_list and not (word_list[end_idx] == ')' and word_list[end_idx + 1] != ')'):
         end_idx += 1
 
+    for i in range(end_idx, start_idx, -1):
+        print(word_list[i])
+
     list_fa = parse_with_fa(word_list[start_idx + repeating + 1:end_idx - repeating])
+    print(list_fa, 'RIPITEBEL', word_list[start_idx + repeating + 1:end_idx - repeating], repeating)
     word_list[start_idx + 1:end_idx] = list_fa
 
 
@@ -282,7 +304,7 @@ def __parse_expr(word_list, start_idx, asn):
     ternary = False
 
     t_set = getTerminalSet(
-        '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/terminal_no_ops.txt')
+        '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/term_expr.txt')
     rb_ex = {'{', ';'}
 
     if asn:
