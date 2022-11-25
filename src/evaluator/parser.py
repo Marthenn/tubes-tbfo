@@ -125,10 +125,10 @@ def parse_with_fa(word_list):
     in_ops, found_in = False, False
     variable_fa = automata.VariableAutomata()
     call_cfg = convertCNF.fileToCNF(
-        "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/fa_res.txt")
+        "automata/fa_res.txt")
 
     t_setx = convertCNF.getTerminalSet(
-        '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/terminal_no_ops.txt')
+        'automata/terminal_no_ops.txt')
 
     __parse_call(word_list, call_cfg, t_setx)
 
@@ -295,7 +295,7 @@ def __parse_expr(word_list, start_idx, asn):
     ternary = False
 
     t_set = convertCNF.getTerminalSet(
-        '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/term_expr.txt')
+        'automata/term_expr.txt')
     rb_ex = {'{', ';'}
 
     if asn:
@@ -387,7 +387,7 @@ def run_test(cnf_path, file_path):
 
 
 if __name__ == '__main__':
-    result = run_test("/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/res.txt",
-             '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt')
+    result = run_test("automata/res.txt",
+             'contoh.txt')
     print(result)
 

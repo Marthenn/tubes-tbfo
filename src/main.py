@@ -15,7 +15,6 @@ if __name__ == "__main__":
     cfg=uselessElimination(cfg)
     cfg=convertToCNF(cfg)
     writeToFile("automata/cnf.txt",cfg)
-    cnf=fileToCNF("automata/cnf.txt")
     cnf = fileToCNF("automata/cnf.txt")
     arr_rs = (parse_words_from_file(sys.argv[1]))
 
