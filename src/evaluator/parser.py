@@ -66,7 +66,7 @@ def parse_fa_cfg(list_r):
 
 def parse_words(snt):
     special_group = ['//', '{', '}', '(', ')', '+', '-', '*', '%', '!', '<=', '>=', '>', '<', ';',
-                     '&&', '||', '==', '=', '\n', '?', '"', "'", '[', ']', ':']
+                     '&&', '||', '==', '=', '\n', '?', '"', "'", '[', ']', ':', ',']
 
     for special in special_group:
         snt = snt.replace(special, ' ' + special + ' ')
@@ -142,10 +142,21 @@ def parse_with_fa(word_list):
 
 
 def __parse_call(word_list, call_cfg, t_set):
+    ex_set = {';', '{', '('}
     for i, el in enumerate(word_list):
         list_len = len(word_list)
 
-        if i + 1 < list_len and word_list[i + 1] == '(' and not (i - 1 >= 0 and (word_list[i] in t_set or word_list[i-1] in t_set)):
+        if el == 'catch':
+            print('KONTOL')
+
+        if el in t_set:
+            continue
+
+        if el == 'catch':
+            print('KONTOL babi')
+
+        if i + 1 < list_len and word_list[i + 1] == '(' and not (i - 1 >= 0 and (word_list[i] in t_set or
+                                                                                 (word_list[i-1] in t_set and word_list[i-1] not in ex_set))):
             end_idx = i
 
             while end_idx < list_len and word_list[end_idx] != ')':
@@ -180,6 +191,7 @@ def __parse_call(word_list, call_cfg, t_set):
             continue
 
         if '.' in el and el[0] != '.' and el[len(el)-1] != '.':
+
             is_obj_props = cyk.evaluate_cyk(parse_fa_cfg([word_list[i]]), call_cfg, 'FUNCTION_CALL')
 
             if is_obj_props:
@@ -226,16 +238,18 @@ def __parse_expr(word_list, start_idx):
     literal = ''
     in_literal = False
     ternary = False
-    check = False
 
-    while end_idx < list_len and word_list[end_idx] != ';' and word_list[end_idx] != ':' and (word_list[end_idx] != ')' or not (
-            word_list[end_idx] == ')' and end_idx + 1 < list_len and (
-            word_list[end_idx + 1] == '{' or word_list[end_idx + 1] == ';'))):
+    if word_list[start_idx] == 'e':
+        print('sda')
+
+    t_setx = getTerminalSet(
+        '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/terminal_no_ops.txt')
+
+    while end_idx < list_len and word_list[end_idx] not in t_setx:
         word = word_list[end_idx]
 
         if (word == '"' or word == "'") and in_literal:
             eval_list.append(literal + word)
-            check = True
             literal = ''
             in_literal = False
             end_idx += 1
@@ -262,9 +276,6 @@ def __parse_expr(word_list, start_idx):
         return
 
     eval_s = ternary_fa.evaluate(eval_list) if ternary else expr_fa.evaluate(eval_list)
-
-    if check:
-        print(eval_s, eval_list, 'GAGAL')
 
     if not eval_s:
         return
@@ -306,6 +317,8 @@ if __name__ == '__main__':
     for idx in range(len(lst) - 1, -1, -1):
         if lst[idx] == '' or lst[idx] == '\n' or lst[idx] == ';':
             lst.pop(idx)
+
+    print(lst)
 
     print(cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE'))
     # y = time.time()
