@@ -156,16 +156,15 @@ class OperationAutomata(Automata, ABC):
                            ('S3', 'VAR'): 'S5',
                            ('S3', 'F_CALL'): 'S4',
                            ('S3', 'URY_PRE'): 'S3',
+                           ('S3', 'BIN_URY_PRE'): 'S3',
                            ('S3', 'URY_POST_PRE_NU'): 'S3',
                            ('S3', 'LLS'): 'S4',
                            ('S4', 'COMP_OPS'): 'S1',
                            ('S4', 'BIN_OPS'): 'S1',
-                           # ('S4', 'URY_POST_PRE_NU'): 'S1',
                            ('S4', 'BIN_URY_PRE'): 'S1',
                            ('S5', 'URY_POST_PRE_NU'): 'S5',
                            ('S5', 'COMP_OPS'): 'S1',
                            ('S5', 'BIN_OPS'): 'S1',
-                           # ('S5', 'URY_POST_PRE_NU'): 'S1',
                            ('S5', 'BIN_URY_PRE'): 'S1'}
         self.operators = {'COMP_OPS': {'==', '!=', '===', '!==', '>', '>=', '<', '<='},  # comparison operators
                           'BIN_OPS': {'*', '/', '%', '**', '&', '|', '^', '<<', '>>', '>>>', '&&', '||'},

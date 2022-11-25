@@ -1,8 +1,10 @@
 import time
 
-from convertCNF import fileToCNF, getTerminalSet
+# from grammar.convertCNF import fileToCNF, getTerminalSet
 from src.evaluator import automata
 from src.evaluator import cyk
+
+from src.grammar import convertCNF
 
 
 def parse_comments(word_list, start_idx):
@@ -123,10 +125,10 @@ def parse_words_from_file(file_path):
 def parse_with_fa(word_list):
     in_ops, found_in = False, False
     variable_fa = automata.VariableAutomata()
-    call_cfg = fileToCNF(
+    call_cfg = convertCNF.fileToCNF(
         "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/fa_res.txt")
 
-    t_setx = getTerminalSet(
+    t_setx = convertCNF.getTerminalSet(
         '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/terminal_no_ops.txt')
 
     __parse_call(word_list, call_cfg, t_setx)
@@ -293,7 +295,7 @@ def __parse_expr(word_list, start_idx, asn):
     in_literal = False
     ternary = False
 
-    t_set = getTerminalSet(
+    t_set = convertCNF.getTerminalSet(
         '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/term_expr.txt')
     rb_ex = {'{', ';'}
 
@@ -365,29 +367,9 @@ def __parse_expr(word_list, start_idx, asn):
     word_list[start_idx:end_idx] = ['expr']
 
 
-prod = {'IF': 'if',
-        'ELSE': 'else',
-        'KURUNG_BUKA': '(',
-        'KURUNG TUTUP': ')',
-        'KURUNGC_BUKA': '{',
-        'KURUNGC TUTUP': '}',
-        'EQUAL': '=',
-        'LET': 'let',
-        'SEMICOL': ';',
-        'RETURN': 'return',
-        'NEWLINE': '\n',
-        'EXPR': 'expr',
-        'FOR': 'for',
-        'BREAK': 'break'}
-
-if __name__ == '__main__':
-    x = time.time()
-
-    cnf = fileToCNF(
-        "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/res.txt")
-    arr_rs = (
-        parse_words_from_file(
-            '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt'))
+def run_test(cnf_path, file_path):
+    cnf = convertCNF.fileToCNF(cnf_path)
+    arr_rs = (parse_words_from_file(file_path))
 
     lst = parse_with_fa(arr_rs)
 
@@ -395,16 +377,42 @@ if __name__ == '__main__':
         if lst[idx] == '' or lst[idx] == ';':
             lst.pop(idx)
 
-    print(' '.join(lst))
-
     for idx in range(len(lst) - 1, -1, -1):
         if lst[idx] == '' or lst[idx] == '\n' or lst[idx] == ';':
             lst.pop(idx)
 
     if len(lst) != 0:
-        print(cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE'))
+        return cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE')
     else:
-        print('length is 0, accepted')
-    # y = time.time()
+        return True
 
-    # print(y - x)
+
+if __name__ == '__main__':
+    result = run_test("/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/res.txt",
+             '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt')
+    print(result
+          )
+    # cnf = convertCNF.fileToCNF(
+    #     "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/res.txt")
+    # arr_rs = (
+    #     parse_words_from_file(
+    #         '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt'))
+
+
+    # lst = parse_with_fa(arr_rs)
+    #
+    # for idx in range(len(lst) - 1, -1, -1):
+    #     if lst[idx] == '' or lst[idx] == ';':
+    #         lst.pop(idx)
+    #
+    # print(' '.join(lst))
+    #
+    # for idx in range(len(lst) - 1, -1, -1):
+    #     if lst[idx] == '' or lst[idx] == '\n' or lst[idx] == ';':
+    #         lst.pop(idx)
+    #
+    # if len(lst) != 0:
+    #     print(cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE'))
+    # else:
+    #     print('length is 0, accepted')
+
