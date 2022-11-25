@@ -5,8 +5,8 @@ from src.evaluator import automata
 from src.evaluator import cyk
 
 
-def parse_fa_cfg(list):
-    stn = ''.join(list)
+def parse_fa_cfg(list_r):
+    stn = ''.join(list_r)
 
     splitters = ['.', ',', '(', ')', '[', ']']
 
@@ -15,7 +15,7 @@ def parse_fa_cfg(list):
 
     sp_list = stn.split(' ')
 
-    terms = {'.', '(', ')', '[', ']'}
+    terms = {'.', '(', ')', '[', ']', 'var_name', 'expr'}
 
     aum = automata.VariableAutomata()
     aus = automata.OperationAutomata()
@@ -27,13 +27,38 @@ def parse_fa_cfg(list):
             if val_s:
                 sp_list[i] = 'var_name'
                 continue
-            print(el)
-            val_x = aus.evaluate(el)
 
+            parse = parse_words(sp_list[i])
+
+            for j, elp in enumerate(parse):
+                if elp == '"':
+                    end_idx = j + 1
+                    while end_idx < len(parse) and parse[end_idx] != "'":
+                        end_idx += 1
+
+                    if end_idx >= len(parse):
+                        continue
+
+                    parse[j:end_idx + 1] = [''.join(parse[j:end_idx + 1])]
+                elif elp == "'":
+
+                    end_idx = j + 1
+                    while end_idx < len(parse) and parse[end_idx] != "'":
+                        end_idx += 1
+
+                    if end_idx >= len(parse):
+                        continue
+
+                    parse[j:end_idx + 1] = [''.join(parse[j:end_idx + 1])]
+
+            val_x = aus.evaluate(parse)
             if val_x:
                 sp_list[i] = 'expr'
+                continue
 
-            print(sp_list[i])
+    for idx in range(len(sp_list) - 1, -1, -1):
+        if sp_list[idx] == '':
+            sp_list.pop(idx)
 
     return sp_list
 
@@ -64,23 +89,7 @@ def parse_words_from_file(file_path):
     list_of_words = []
     with open(file_path) as lines:
         for line in lines:
-            special_group = ['//', '{', '}', '(', ')', '+', '-', '*', '%', '!', '<=', '>=', '>', '<', ';',
-                             '&&', '||', '==', '=', '\n', '?', '"', "'", '[', ']']
-
-            for special in special_group:
-                line = line.replace(special, ' ' + special + ' ')
-
-            special_group_multiple = ['=  =', '!  =', '=  =  =', '!  =  =', '>  =', '<  =', '*  *', '>  >  >', '<  <',
-                                      '>  >', '&  &', '|  |', '+  +', '-  -']
-
-            for special_mltp in special_group_multiple:
-                line = line.replace(special_mltp, special_mltp.replace(' ', ''))
-
-            line = line.split(' ')
-
-            for idx in range(len(line) - 1, -1, -1):
-                if line[idx] == '':
-                    line.pop(idx)
+            line = parse_words(line)
 
             list_of_words.extend(line)
 
@@ -89,7 +98,6 @@ def parse_words_from_file(file_path):
 
 def parse_with_fa(word_list, prod):
     in_ops, found_in = False, False
-    prod_key = prod.keys()
     variable_fa = automata.VariableAutomata()
     call_cfg = fileToCNF(
         "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/fa_res.txt")
@@ -125,7 +133,7 @@ def __parse_call(word_list, call_cfg):
     for i, el in enumerate(word_list):
         list_len = len(word_list)
 
-        if '.' in el and el[0] != '.' and el[len(el) - 1] != '.' and not (i + 1 < list_len and word_list[i+1] == '[') :
+        if '.' in el and el[0] != '.' and el[len(el) - 1] != '.' and not (i + 1 < list_len and word_list[i + 1] == '['):
 
             if (i + 1 < list_len and word_list[i + 1] != '(') or i + 1 == list_len:
 
@@ -146,12 +154,12 @@ def __parse_call(word_list, call_cfg):
             is_func_call = cyk.evaluate_cyk(parse_fa_cfg(word_list[i:end_idx + 1]), call_cfg, 'FUNCTION_CALL')
 
             if is_func_call:
-                word_list[i:end_idx + 1] = 'func_call'
+                word_list[i:end_idx + 1] = ['func_call']
 
             continue
 
         # not function call and not a list access
-        if (i + 1 < list_len and word_list[i + 1] != '[') or i + 1 == list_len:
+        if (i + 1 < list_len and word_list[i + 1] != '[') or i + 1 >= list_len:
             continue
 
         # parse for list access
@@ -163,10 +171,12 @@ def __parse_call(word_list, call_cfg):
         if end_idx == list_len:
             continue
 
-        is_list_acc = cyk.evaluate_cyk(parse_fa_cfg(word_list[i:end_idx + 1]), call_cfg, 'FUNCTION_CALL')
+        parsed = parse_fa_cfg(word_list[i:end_idx + 1])
+
+        is_list_acc = cyk.evaluate_cyk(parsed, call_cfg, 'FUNCTION_CALL')
 
         if is_list_acc:
-            word_list[i:end_idx + 1] = 'func_call'
+            word_list[i:end_idx + 1] = ['func_call']
 
 
 def __parse_repeatable(word_list, start_idx, prod):
@@ -195,7 +205,7 @@ def __parse_assignable(word_list, start_idx, call_cfg):
     if word_list[start_idx] != '=':
         return
 
-    __parse_expr(word_list, start_idx + 1)
+    __parse_expr(word_list, start_idx + 1, call_cfg)
 
 
 def __parse_expr(word_list, start_idx, call_cfg):
@@ -270,7 +280,8 @@ if __name__ == '__main__':
     cnf = fileToCNF(
         "/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/automata/res.txt")
     arr_rs = (
-        parse_words_from_file('/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt'))
+        parse_words_from_file(
+            '/home/zidane/kuliah/Semester 3/IF2124 - Teori Bahasa Formal dan Otomata/tubes-tbfo/contoh.txt'))
     arr_1 = ['if', '(', 'konts', '+', '3', '===', '9', ')']
     arr_2 = ['x', '=', 'konts', '+', '3', '===', '9', '+', ';']
     arr_3 = ['let', 'x', ';']
