@@ -8,6 +8,9 @@ def getTerminal(name):
     file.close()
     return terminals
 
+def getTerminalSet(name):
+    return set(getTerminal(name))   
+
  # Convert a text based CFG to an array
 def cfgToArray(name):
     file=open(name,'r')
@@ -218,7 +221,7 @@ def epsilonElimination(cfg):
                         # Check if the replaced unit is single or not
                         if(i==start and (i+1==len(rule) or rule[i+1]=='|') and epsilon!=rule[0]):
                             # print(i)
-                            print("went in again")
+                            # print("went in again")
                             j=start
                             rule.append('|')
                             rule.append('EPSILON')
@@ -458,9 +461,9 @@ def ruleExist(cfg,rule):
             i=0
             flag=True
             while(i<len(rule)):
-                print(lines)
-                print(rule)
-                print(i)
+                # print(lines)
+                # print(rule)
+                # print(i)
                 if(lines[i+2]!=rule[i]):
                     flag=False
                     break
@@ -501,8 +504,8 @@ def convertToCNF(cfg):
                             prod[id] = var
                             rules[start + id] = var
 
-                if rules[0] == 'T24':
-                        print(new)
+                # if rules[0] == 'T24':
+                #         print(new)
                 # Change prod with length of 3 or more
                 if len(prod) > 2:
                     new=[]

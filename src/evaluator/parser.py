@@ -1,6 +1,6 @@
-import time
+import os
 
-from convertCNF import fileToCNF, getTerminalSet
+from src.grammar.convertCNF import fileToCNF, getTerminalSet
 from src.evaluator import automata
 from src.evaluator import cyk
 
@@ -132,10 +132,10 @@ def parse_with_fa(word_list):
     in_ops, found_in = False, False
     variable_fa = automata.VariableAutomata()
     call_cfg = fileToCNF(
-        "D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/terminal_cnf.txt")
+        "automata/terminal_cnf.txt")
 
     t_setx = getTerminalSet(
-        'D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/terminal_no_ops.txt')
+        'automata/terminal_no_ops.txt')
 
     __parse_call(word_list, call_cfg, t_setx)
 
@@ -282,7 +282,7 @@ def __parse_expr(word_list, start_idx, asn):
     ternary = False
 
     t_set = getTerminalSet(
-        'D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/terminal_no_ops.txt')
+        'automata/terminal_no_ops.txt')
     rb_ex = {'{', ';'}
 
     if asn:
@@ -369,7 +369,6 @@ prod = {'IF': 'if',
         'BREAK': 'break'}
 
 if __name__ == '__main__':
-    x = time.time()
 
     cnf = fileToCNF("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/automata/result.txt")
     arr_rs = (parse_words_from_file("D:/Kuliah/Semester 3/TBFO/tubes-tbfo/test/test6.js"))
@@ -387,6 +386,3 @@ if __name__ == '__main__':
             lst.pop(idx)
 
     print(cyk.evaluate_cyk(lst, cnf, 'MAIN_STATE'))
-    # y = time.time()
-
-    # print(y - x)
